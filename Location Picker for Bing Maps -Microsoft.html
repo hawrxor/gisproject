@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="utf-8" />
+	  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script type='text/javascript'>
+    var map;
+	
+    function GetMap() {
+        map = new Microsoft.Maps.Map('#myMap', {});
+
+        Microsoft.Maps.loadModule('Microsoft.Maps.AutoSuggest', function () {
+            var manager = new Microsoft.Maps.AutosuggestManager({ map: map });
+            manager.attachAutosuggest('#searchBox', '#searchBoxContainer', suggestionSelected);
+        });
+
+		
+		
+
+    }
+
+    function highlight(id, event) {
+        //Highlight the mouse event div to indicate that the event has fired.
+		
+		
+		
+        document.getElementById(id).style.background = 'LightGreen';
+
+        document.getElementById('pushpinLocation').value = event.target.getLocation().toString();
+
+        var LatLong = event.target.getLocation();
+        document.getElementById('LatVal').value = LatLong.latitude;
+        document.getElementById('LongVal').value = LatLong.longitude;
+        //Remove the highlighting after a second.
+        setTimeout(function () { document.getElementById(id).style.background = 'white'; }, 1000);
+    }
+    
+
+    function suggestionSelected(result) {
+        //Remove previously selected suggestions from the map.
+        map.entities.clear();
+
+        //Show the suggestion as a pushpin and center map over it.
+        var pin = new Microsoft.Maps.Pushpin((result.location),{draggable:true,icon: 'https://www.bingmapsportal.com/Content/images/poi_custom.png'});
+        map.entities.push(pin);
+		
+		Microsoft.Maps.Events.addHandler(pin, 'drag', function (e) { highlight('pushpinDrag', e); });
+        Microsoft.Maps.Events.addHandler(pin, 'dragend', function (e) { highlight('pushpinDragEnd', e); });
+        Microsoft.Maps.Events.addHandler(pin, 'dragstart', function (e) { highlight('pushpinDragStart', e); });
+
+        map.setView({ bounds: result.bestView });
+    }
+	
+    </script>
+    <script type='text/javascript' src='https://www.bing.com/api/maps/mapcontrol?callback=GetMap&key=ArUaXpuYqGfI87s5-hGqFQgE9MwBq6pwOLEz9UtTjuIIvcN3riycjYpiOsXsKbf1' async defer></script>
+</head>
+<body>
+<div class="container">
+    <div class="form-group" id='searchBoxContainer'>
+        <input class="form-control" type='text' id='searchBox' />
+    </div>
+
+    <div style="display:none" id="pushpinDrag">drag</div>
+    <div style="display:none" id="pushpinDragEnd">dragend</div>
+    <div style="display:none" id="pushpinDragStart">dragstart</div>
+    <!-- <div>Pin Location: <span id="pushpinLocation"></span></div> -->
+	<input type="text" id="pushpinLocation" value=""/>
+	
+	Latitde <input type="text"  id="LatVal" />
+	Longitude <input type="text"  id="LongVal" />
+	
+    <div id="myMap" style="position:relative;width:800px;height:600px;"></div>
+	</div>
+</body>
+</html>
